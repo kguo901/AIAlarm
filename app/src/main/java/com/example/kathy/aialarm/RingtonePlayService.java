@@ -34,14 +34,14 @@ public class RingtonePlayService extends Service {
 
         boolean playRingtone = intent.getExtras().getBoolean("ringtone", false);
         if(!serviceStarted && playRingtone){
-            uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             r = RingtoneManager.getRingtone(getApplicationContext(), uri);
-            //r.play();
+            r.play();
 
             createNotification();
             serviceStarted = true;
         } else if (serviceStarted && !playRingtone) {
-            //r.stop();
+            r.stop();
             serviceStarted = false;
         }
 
