@@ -110,5 +110,14 @@
                 android:clickable="true"
                 tools:gravity="fill_vertical|center_horizontal"/>
         </LinearLayout>
+
+        <Switch
+            android:text="Repeat Weekly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/repeatWeeklySwitch"
+            android:layout_below="@+id/dateSelect"
+            android:layout_alignParentStart="true" />
+
     </RelativeLayout>
 </FrameLayout>
