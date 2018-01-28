@@ -34,7 +34,81 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/switch2"
-            android:layout_below="@+id/alarmState"
+            android:layout_below="@+id/dateSelect"
             android:layout_alignParentEnd="true" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="25dp"
+            android:paddingRight="25dp"
+            android:id="@+id/dateSelect"
+            android:layout_below="@+id/alarmState"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:text="Mo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/monday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal" />
+
+            <TextView
+                android:text="Tu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tuesday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+
+            <TextView
+                android:text="We"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/wednesday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+
+            <TextView
+                android:text="Th"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/thursday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+
+            <TextView
+                android:text="Fr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/friday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+
+            <TextView
+                android:text="Sa"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/saturday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+
+            <TextView
+                android:text="Su"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/sunday"
+                android:layout_weight="0.18"
+                android:clickable="true"
+                tools:gravity="fill_vertical|center_horizontal"/>
+        </LinearLayout>
     </RelativeLayout>
 </FrameLayout>
