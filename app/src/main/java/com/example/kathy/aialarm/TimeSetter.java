@@ -48,6 +48,9 @@ public class TimeSetter extends Fragment {
     Switch switch2;
     Context context;
     PendingIntent pendingIntent;
+    static final int NUM_DAYS = 7;
+    ClickableText dateSelection[] = new ClickableText[NUM_DAYS];
+
     final long PERIOD = 0;
     public TimeSetter() {
         // Required empty public constructor
@@ -91,6 +94,14 @@ public class TimeSetter extends Fragment {
         timePicker = (TimePicker) view.findViewById(R.id.timePicker);
         alarmState = (TextView) view.findViewById(R.id.alarmState);
         switch2 = (Switch) view.findViewById(R.id.switch2);
+
+        dateSelection[0] = new ClickableText(view.findViewById(R.id.monday));
+        dateSelection[1] = new ClickableText(view.findViewById(R.id.tuesday));
+        dateSelection[2] = new ClickableText(view.findViewById(R.id.wednesday));
+        dateSelection[3] = new ClickableText(view.findViewById(R.id.thursday));
+        dateSelection[4] = new ClickableText(view.findViewById(R.id.friday));
+        dateSelection[5] = new ClickableText(view.findViewById(R.id.saturday));
+        dateSelection[6] = new ClickableText(view.findViewById(R.id.sunday));
 
         final Calendar calendar = Calendar.getInstance();
         final Intent intent = new Intent(getActivity(), AlarmReceiver.class);
