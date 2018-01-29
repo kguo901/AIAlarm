@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -50,6 +51,8 @@ public class TimeSetter extends Fragment {
     PendingIntent pendingIntent;
     static final int NUM_DAYS = 7;
     ClickableText dateSelection[] = new ClickableText[NUM_DAYS];
+    enum Day {Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday};
+    int alarmHour, alarmMinute, alarmDayDisplacement = 0;
 
     final long PERIOD = 0;
     public TimeSetter() {
@@ -108,29 +111,19 @@ public class TimeSetter extends Fragment {
 
         switch2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    if (Build.VERSION.SDK_INT >= 23 ){
-                        calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-                        calendar.set(Calendar.MINUTE, timePicker.getMinute());
-
-
-                        setAlarmState("Alarm set to " + timePicker.getHour() + ":" + timePicker.getMinute());
-                    }
-                    else{
-                        calendar.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
-                        calendar.set(Calendar.MINUTE, timePicker.getCurrentMinute());
-                        setAlarmState("Alarm set to " + timePicker.getCurrentHour() + ":" + timePicker.getCurrentMinute());
-                    }
-                    intent.putExtra("ringtone", true);
-                    pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PERIOD, pendingIntent);
-                    Log.e("Main activity:", calendar.getTime().toString());
-                } else {
-                    setAlarmState("Off");
-                    alarmManager.cancel(pendingIntent);
-                    intent.putExtra("ringtone", false);
-                    getActivity().sendBroadcast(intent);
-                }
+            if(isChecked){
+                updateAlarmTime();
+                setCalendar(calendar);
+                intent.putExtra("ringtone", true);
+                pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PERIOD, pendingIntent);
+                Log.e("Final", calendar.getTime().toString());
+            } else {
+                setAlarmState("Off");
+                alarmManager.cancel(pendingIntent);
+                intent.putExtra("ringtone", false);
+                getActivity().sendBroadcast(intent);
+            }
             }
         });
 
@@ -178,5 +171,117 @@ public class TimeSetter extends Fragment {
 
     private void setAlarmState(String text){
         alarmState.setText(text);
+    }
+
+    private void setCalendar(Calendar calendar){
+        Date alarmDate = getClosestDate(getNextEnabledDay());
+        if(alarmDate != null) {
+            calendar.setTime(alarmDate);
+
+            calendar.set(Calendar.HOUR_OF_DAY, alarmHour);
+            calendar.set(Calendar.MINUTE, alarmMinute);
+
+            setAlarmState("Alarm set to " + alarmHour + ":" + alarmMinute);
+        }
+    }
+
+    private Day getNextEnabledDay(){
+        alarmDayDisplacement = 0;
+        Day day = getCurrentDay();
+        Calendar currentTime = Calendar.getInstance();
+        boolean test = compareTime(currentTime.get(Calendar.HOUR_OF_DAY), currentTime.get(Calendar.MINUTE), alarmHour, alarmMinute)>0;
+        if(!dateSelection[day.ordinal()].isTextEnabled()
+                || test){
+            int displacement = 1;
+            int nextClosestDay;
+            boolean foundNextEnabled = false;
+            while (displacement < NUM_DAYS + 1 && !foundNextEnabled){
+                nextClosestDay = (day.ordinal() + displacement)%NUM_DAYS;
+                if(dateSelection[nextClosestDay].isTextEnabled()){
+                    day = Day.values()[nextClosestDay];
+                    foundNextEnabled = true;
+                } else
+                    displacement++;
+            }
+            if(foundNextEnabled)
+                alarmDayDisplacement = displacement;
+            else
+                dateSelection[getCurrentDay().ordinal()].enableView();
+        }
+        Log.e("getNextEnabledDay",day.name());
+        return day;
+    }
+
+    private Date getClosestDate(Day day){
+        if(day != null) {
+            Calendar c = Calendar.getInstance();
+            /*Day currentDay = getCurrentDay();
+            int displacement = day.ordinal() - currentDay.ordinal();
+            if (displacement < 0) {
+                displacement = Math.abs(displacement) + NUM_DAYS;
+            }*/
+            c.add(Calendar.DATE, alarmDayDisplacement);
+            Log.e("getClosestDate", c.getTime().toString());
+            return c.getTime();
+        } else {
+            return null;
+        }
+    }
+
+    private Day getCurrentDay(){
+        switch(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)){
+            case Calendar.MONDAY:
+                return Day.Monday;
+            case Calendar.TUESDAY:
+                return Day.Tuesday;
+            case Calendar.WEDNESDAY:
+                return Day.Wednesday;
+            case Calendar.THURSDAY:
+                return Day.Thursday;
+            case Calendar.FRIDAY:
+                return Day.Friday;
+            case Calendar.SATURDAY:
+                return Day.Saturday;
+            case Calendar.SUNDAY:
+                return Day.Sunday;
+            default:
+                return null;
+        }
+    }
+
+    //returns 1 if first time is greater than second
+    //returns 0 if both times are equal
+    //returns -1 if second time is greather than first
+    private int compareTime(int hour1, int minute1, int hour2, int minute2){
+        int hourDiff = hour1 - hour2;
+        int minuteDiff = minute1 - minute2;
+        if(hourDiff > 0)
+            return 1;
+        else if(hourDiff < 0)
+            return -1;
+        else{
+            Log.e("minute 1", Integer.toString(minute1));
+            Log.e("minute 2", Integer.toString(minute1));
+            Log.e("minute 1- minute 2", Integer.toString(minuteDiff));
+            Log.e("minuteDiff > 0", Boolean.toString(minuteDiff > 0));
+            Log.e("minuteDiff < 0", Boolean.toString(minuteDiff < 0));
+            Log.e("minuteDiff = 0", Boolean.toString(minuteDiff == 0));
+            if(minuteDiff > 0)
+                return 1;
+            else if(minuteDiff < 0)
+                return -1;
+            else
+                return 0;
+        }
+    }
+
+    private void updateAlarmTime(){
+        if (Build.VERSION.SDK_INT >= 23) {
+            alarmHour = timePicker.getHour();
+            alarmMinute = timePicker.getMinute();
+        } else {
+            alarmHour = timePicker.getCurrentHour();
+            alarmMinute = timePicker.getCurrentMinute();
+        }
     }
 }
