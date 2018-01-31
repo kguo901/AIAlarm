@@ -29,7 +29,7 @@ public class ClickableText {
     }
 
     public void disableView(){
-        if(button instanceof TextView){
+        if(button instanceof TextView && isTextEnabled()){
             TextView textView = (TextView)button;
             textView.setTypeface(null, Typeface.NORMAL);
             isEnabled = false;
@@ -37,7 +37,7 @@ public class ClickableText {
     }
 
     public void enableView(){
-        if(button instanceof TextView){
+        if(button instanceof TextView && !isTextEnabled()){
             TextView textView = (TextView)button;
             textView.setTypeface(null, Typeface.BOLD);
             isEnabled = true;
