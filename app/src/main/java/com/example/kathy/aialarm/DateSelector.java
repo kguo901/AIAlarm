@@ -1,11 +1,9 @@
 package com.example.kathy.aialarm;
 
+import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -28,6 +26,7 @@ public class DateSelector {
     private Switch weeklyRepeatSwitch;
     private boolean switchIsON = false;
     private TextView alarmState;
+    private Context context;
 
     public DateSelector(View view){
         dateSelection[0] = new ClickableText(view.findViewById(R.id.monday));
@@ -50,6 +49,10 @@ public class DateSelector {
                 }
             }
         });
+
+        context = view.getContext();
+        /*LocalBroadcastManager.getInstance(context).registerReceiver(mYourBroadcastReceiver,
+                new IntentFilter("alarm-triggered"));*/
     }
 
     public void setAlarmState(String text){
@@ -69,20 +72,12 @@ public class DateSelector {
         }
     }
 
-    public void enableDate(Day day){
-        dateSelection[day.ordinal()].enableView();
-    }
-
-    public void disableDate(Day day){
-        dateSelection[day.ordinal()].disableView();
-    }
-
     public void setAlarmRepeat(boolean setting){
         if(switchIsON != setting)
             switchIsON = !switchIsON;
     }
 
-    private Day getNextEnabledDay(){
+    public Day getNextEnabledDay(){
         alarmDayDisplacement = 0;
         Day day = getCurrentDay();
         Calendar currentTime = Calendar.getInstance();
@@ -120,7 +115,7 @@ public class DateSelector {
         }
     }
 
-    private Day getCurrentDay(){
+    public Day getCurrentDay(){
         switch(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)){
             case Calendar.MONDAY:
                 return Day.Monday;
@@ -175,5 +170,27 @@ public class DateSelector {
             alarmHour = timePicker.getCurrentHour();
             alarmMinute = timePicker.getCurrentMinute();
         }
+    }
+   /* private final BroadcastReceiver mYourBroadcastReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Log.e("dateSelector", "received");
+
+            //TODO: if no dates are enabled, turn alarm switch off
+            onDestroy();
+        }
+    };
+*/
+    public boolean repeatWeekly(){
+        return switchIsON;
+    }
+
+    public void disableDay(Day day){
+        dateSelection[day.ordinal()].disableView();
+    }
+    private void onDestroy(){
+       // LocalBroadcastManager.getInstance(context).unregisterReceiver(mYourBroadcastReceiver);
     }
 }

@@ -2,23 +2,22 @@ package com.example.kathy.aialarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.TimePicker;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import static android.content.Context.ALARM_SERVICE;
 
@@ -77,6 +76,7 @@ public class TimeSetter extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -90,6 +90,9 @@ public class TimeSetter extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mYourBroadcastReceiver,
+                new IntentFilter("alarm-triggered"));
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_time_setter, container, false);
         dateSelector = new DateSelector(view);
@@ -109,6 +112,12 @@ public class TimeSetter extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mYourBroadcastReceiver);
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {
@@ -124,6 +133,18 @@ public class TimeSetter extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
+    private final BroadcastReceiver mYourBroadcastReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if(!dateSelector.repeatWeekly())
+                dateSelector.disableDay(dateSelector.getCurrentDay());
+            setAlarm();
+            Log.e("localBroadcastReceiver", "received");
+        }
+    };
 
     /**
      * This interface must be implemented by activities that contain this
